@@ -18,17 +18,20 @@ public class UserController {
     UserService userService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> save(@RequestBody User user){
         userService.save(user);
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> update(@RequestBody User user){
         return new ResponseEntity<>(userService.update(user),HttpStatus.OK);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> getUsersList() {
         List<User> users = userService.getAllUsers();
         if (users.isEmpty()) {
@@ -39,6 +42,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> getUser(@PathVariable String email){
         User user = userService.getUserByEmail(email);
         if (user==null){
