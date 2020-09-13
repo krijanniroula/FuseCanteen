@@ -7,7 +7,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Document(collection = "order")
@@ -18,12 +20,12 @@ public class Order {
     private OrderStatus orderStatus;
 
     @DBRef
-    private FoodItem foodItem;
+    private Set<FoodItem> foodItem = new HashSet<>();
 
     @DBRef
     private User user;
 
-    private Date date;
+    private LocalDate date;
 
     private String description;
 

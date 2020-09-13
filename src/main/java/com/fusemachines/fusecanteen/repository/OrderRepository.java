@@ -5,12 +5,12 @@ import com.fusemachines.fusecanteen.models.order.OrderStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface OrderRepository extends MongoRepository<Order,String> {
 
     List<Order> findByOrderStatus(OrderStatus orderStatus);
-    List<Order> findByDate(Date date);
+    List<Order> findByDate(LocalDate date);
 }

@@ -1,9 +1,121 @@
 package com.fusemachines.fusecanteen.controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
+import com.fusemachines.fusecanteen.models.FoodItem;
+import com.fusemachines.fusecanteen.models.Menu;
+import com.fusemachines.fusecanteen.payload.request.MenuRequest;
+import com.fusemachines.fusecanteen.payload.response.MessageResponse;
+import com.fusemachines.fusecanteen.services.FoodItemService;
+import com.fusemachines.fusecanteen.services.MenuService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("api/menu")
 public class MenuController {
+
+    @Autowired
+    MenuService menuService;
+
+    @Autowired
+    FoodItemService foodItemService;
+
+    private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
+
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Menu>> getAllMenus() {
+
+        List<Menu> MenuList = menuService.getAllMenu();
+        if (MenuList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(MenuList, HttpStatus.OK);
+    }
+
+    @GetMapping("/{date}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Menu> getMenusByDate(@PathVariable String date) throws ParseException {
+        LocalDate localDate = LocalDate.parse(date);
+        Menu menu = menuService.getMenuByDate( localDate );
+        if (menu == null){
+            throw new ResourceNotFoundException("Menu not found for date = "+localDate);
+        }
+        return new ResponseEntity<>( menu, HttpStatus.OK );
+
+    }
+
+    @GetMapping("/today")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Menu> getMenusForToday() throws ParseException {
+
+        LocalDate localDate = LocalDate.now();
+
+        Menu menu = menuService.getMenuByDate( localDate );
+        if (menu == null){
+            throw new ResourceNotFoundException("Menu not found for today!");
+        }
+        return new ResponseEntity<>( menu, HttpStatus.OK );
+
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createMenu(@RequestBody MenuRequest menuRequest) throws ParseException {
+
+       LocalDate localDate = LocalDate.now();
+
+        if ((menuService.getMenuByDate(localDate)) != null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Menu for the date "+localDate+" is already created!"));
+        }
+
+        Menu menu = new Menu(localDate);
+        menu.setFoodItems(getFoodItemsFromName(menuRequest));
+        menuService.save(menu);
+        return new ResponseEntity<>( HttpStatus.CREATED);
+    }
+
+    public Set<FoodItem> getFoodItemsFromName(MenuRequest request) {
+        Set<String> foodItemNames = request.getFoodItems();
+        Set<FoodItem> foodItems = new HashSet<>();
+        System.out.println(request.getFoodItems());
+
+        foodItemNames.forEach(name -> {
+            FoodItem foodItem = foodItemService.getFoodItemByName(name);
+            if (foodItem==null){
+                logger.error("Food Item not found with the name: {}"+name);
+            }
+            foodItems.add(foodItem);
+        });
+        return foodItems;
+    }
+
+    @PutMapping("/{date}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Menu> updateMenu(@PathVariable String date, @RequestBody MenuRequest menuRequest) throws ParseException {
+
+        Set<FoodItem> foodItemSet = getFoodItemsFromName(menuRequest);
+        return new ResponseEntity<>( menuService.update(date,foodItemSet),HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<HttpStatus> deleteMenuById(@PathVariable String id) {
+        menuService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

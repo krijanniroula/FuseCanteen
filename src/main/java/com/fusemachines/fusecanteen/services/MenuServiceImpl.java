@@ -1,13 +1,16 @@
 package com.fusemachines.fusecanteen.services;
 
+import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
+import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.Menu;
 import com.fusemachines.fusecanteen.repository.MenuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class MenuServiceImpl implements MenuService{
@@ -21,8 +24,11 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public Menu update(Menu menu) {
-        return menuRepository.save(menu);
+    public Menu update(String date, Set<FoodItem> foodItems) throws ParseException {
+
+        Menu menuNew = getMenuByDate(LocalDate.parse(date));
+        menuNew.setFoodItems(foodItems);
+        return menuRepository.save(menuNew);
     }
 
     @Override
@@ -31,7 +37,20 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public Optional<Menu> getMenuByDate(Date date) {
-        return menuRepository.findByDate(date);
+    public Menu getMenuByDate(LocalDate date) {
+        Menu menu = menuRepository.findByDate(date);
+        return menu;
+    }
+
+    @Override
+    public Menu getMenuById(String id) {
+        Menu menu = menuRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Menu not found with id = "+id));
+        return menu;
+    }
+
+    @Override
+    public void deleteById(String id) {
+        Menu menu = getMenuById(id);
+        menuRepository.delete(menu);
     }
 }

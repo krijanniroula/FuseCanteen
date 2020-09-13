@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Data
@@ -20,6 +21,10 @@ public class Menu {
     private Set<FoodItem> foodItems =  new HashSet<>();
 
     @Indexed(unique = true, direction = IndexDirection.DESCENDING)
-    private Date date;
+    private LocalDate date;
+
+    public Menu(LocalDate date){
+        this.date = date;
+    }
 
 }

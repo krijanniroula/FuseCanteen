@@ -1,6 +1,7 @@
 package com.fusemachines.fusecanteen.controllers;
 
 import com.fusemachines.fusecanteen.models.FoodItem;
+import com.fusemachines.fusecanteen.payload.response.MessageResponse;
 import com.fusemachines.fusecanteen.services.FoodItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,11 @@ public class FoodItemController {
     @GetMapping
     public ResponseEntity<List<FoodItem>> getAllFoodItems() {
 
-            List<FoodItem> foodItemList = foodItemService.getAllFoodItems();
-            if (foodItemList.isEmpty()){
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(foodItemList, HttpStatus.OK);
+        List<FoodItem> foodItemList = foodItemService.getAllFoodItems();
+        if (foodItemList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(foodItemList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -36,8 +37,13 @@ public class FoodItemController {
     }
 
     @PostMapping
-    public ResponseEntity<FoodItem> createFoodItem(@RequestBody FoodItem foodItem) {
-        return new ResponseEntity<>( foodItemService.save(foodItem),HttpStatus.CREATED);
+    public ResponseEntity<?> createFoodItem(@RequestBody FoodItem foodItem) {
+        if (foodItemService.getFoodItemByName(foodItem.getName()) != null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Food Item with name "+foodItem.getName()+" is already created!"));
+        }
+        return new ResponseEntity( foodItemService.save(foodItem),HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -47,9 +53,9 @@ public class FoodItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteFoodItemByName(@PathVariable String id) {
-            foodItemService.deleteByName(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<HttpStatus> deleteFoodItemById(@PathVariable String id) {
+        foodItemService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

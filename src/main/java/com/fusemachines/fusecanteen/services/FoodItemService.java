@@ -9,7 +9,7 @@ public interface FoodItemService {
     FoodItem save(FoodItem foodItem);
     FoodItem update(String name,FoodItem foodItem);
     List<FoodItem> getAllFoodItems();
-    Optional<FoodItem> getFoodItemByName(String name);
+    FoodItem getFoodItemByName(String name);
     FoodItem getFoodItemByid(String id);
-    void deleteByName(String id);
+    void deleteById(String id);
 }

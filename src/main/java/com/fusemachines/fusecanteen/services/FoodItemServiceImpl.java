@@ -34,8 +34,8 @@ public class FoodItemServiceImpl implements FoodItemService {
     }
 
     @Override
-    public Optional<FoodItem> getFoodItemByName(String name) {
-        return foodItemRepository.findByName(name);
+    public FoodItem getFoodItemByName(String name) {
+        return foodItemRepository.findByName(name).orElseThrow(()-> new ResourceNotFoundException("Food Item not found with name = "+name));
     }
 
     @Override
@@ -45,7 +45,7 @@ public class FoodItemServiceImpl implements FoodItemService {
     }
 
     @Override
-    public void deleteByName(String id) {
+    public void deleteById(String id) {
         FoodItem foodItem = getFoodItemByid(id);
         foodItemRepository.delete(foodItem);
     }
