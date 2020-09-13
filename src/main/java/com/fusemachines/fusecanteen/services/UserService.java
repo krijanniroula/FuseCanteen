@@ -10,6 +10,6 @@ public interface UserService {
     List<User> getAllUsers();
     void deleteUserById(String id);
     User getUserByEmail(String email);
-    Optional<User> getUserById(String id);
+    User getUserById(String id);
 
 }

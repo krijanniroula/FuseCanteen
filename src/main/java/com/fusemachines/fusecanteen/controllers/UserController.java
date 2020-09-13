@@ -1,5 +1,6 @@
 package com.fusemachines.fusecanteen.controllers;
 
+import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.models.user.User;
 import com.fusemachines.fusecanteen.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user){
-        try {
-            return new ResponseEntity<>( userService.save(user),HttpStatus.CREATED);
-        }  catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-       }
+        return new ResponseEntity<>( userService.save(user),HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -34,23 +31,16 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getUsersList() {
-        try{
             List<User> users = userService.getAllUsers();
             if (users.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(users, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable String id){
-        User user = userService.getUserByEmail(id);
-        if (user==null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        User user = userService.getUserById( id );
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 

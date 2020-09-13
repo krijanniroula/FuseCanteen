@@ -1,5 +1,6 @@
 package com.fusemachines.fusecanteen.services;
 
+import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.repository.FoodItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,7 @@ public class FoodItemServiceImpl implements FoodItemService {
 
     @Override
     public FoodItem update(String id,FoodItem foodItem) {
-        FoodItem foodItemNew = foodItemRepository.findById(id).orElse(null);
-        if(foodItemNew==null){
-            return null;
-        }
+        FoodItem foodItemNew = getFoodItemByid(id);
         foodItemNew.setName(foodItem.getName());
         foodItemNew.setPrice(foodItem.getPrice());
         return foodItemRepository.save(foodItemNew);
@@ -41,13 +39,14 @@ public class FoodItemServiceImpl implements FoodItemService {
     }
 
     @Override
-    public Optional<FoodItem> getFoodItemByid(String id) {
-        return foodItemRepository.findById(id);
+    public FoodItem getFoodItemByid(String id) {
+        FoodItem foodItem =  foodItemRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Food Item not found with id = "+id));;
+        return foodItem;
     }
 
     @Override
     public void deleteByName(String id) {
-        Optional<FoodItem> foodItem = foodItemRepository.findById(id);
-        foodItemRepository.delete(foodItem.get());
+        FoodItem foodItem = getFoodItemByid(id);
+        foodItemRepository.delete(foodItem);
     }
 }

@@ -10,6 +10,6 @@ public interface FoodItemService {
     FoodItem update(String name,FoodItem foodItem);
     List<FoodItem> getAllFoodItems();
     Optional<FoodItem> getFoodItemByName(String name);
-    Optional<FoodItem> getFoodItemByid(String id);
+    FoodItem getFoodItemByid(String id);
     void deleteByName(String id);
 }
