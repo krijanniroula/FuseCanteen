@@ -35,12 +35,12 @@ public class FoodItemServiceImpl implements FoodItemService {
 
     @Override
     public FoodItem getFoodItemByName(String name) {
-        return foodItemRepository.findByName(name).orElseThrow(()-> new ResourceNotFoundException("Food Item not found with name = "+name));
+        return foodItemRepository.findByName(name).orElseThrow(()-> new ResourceNotFoundException("Food Item not found with the name = "+name));
     }
 
     @Override
     public FoodItem getFoodItemByid(String id) {
-        FoodItem foodItem =  foodItemRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Food Item not found with id = "+id));;
+        FoodItem foodItem =  foodItemRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Food Item not found with the id = "+id));;
         return foodItem;
     }
 

@@ -7,8 +7,6 @@ import com.fusemachines.fusecanteen.payload.request.MenuRequest;
 import com.fusemachines.fusecanteen.payload.response.MessageResponse;
 import com.fusemachines.fusecanteen.services.FoodItemService;
 import com.fusemachines.fusecanteen.services.MenuService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +28,6 @@ public class MenuController {
 
     @Autowired
     FoodItemService foodItemService;
-
-    private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
-
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -92,13 +87,9 @@ public class MenuController {
     public Set<FoodItem> getFoodItemsFromName(MenuRequest request) {
         Set<String> foodItemNames = request.getFoodItems();
         Set<FoodItem> foodItems = new HashSet<>();
-        System.out.println(request.getFoodItems());
 
         foodItemNames.forEach(name -> {
             FoodItem foodItem = foodItemService.getFoodItemByName(name);
-            if (foodItem==null){
-                logger.error("Food Item not found with the name: {}"+name);
-            }
             foodItems.add(foodItem);
         });
         return foodItems;
