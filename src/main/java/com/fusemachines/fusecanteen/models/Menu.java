@@ -1,6 +1,5 @@
 package com.fusemachines.fusecanteen.models;
 
-import com.fusemachines.fusecanteen.models.user.Role;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.IndexDirection;
@@ -18,7 +17,7 @@ public class Menu {
     private String id;
 
     @DBRef
-    private Set<FoodItems> foodItems =  new HashSet<>();
+    private Set<FoodItem> foodItems =  new HashSet<>();
 
     @Indexed(unique = true, direction = IndexDirection.DESCENDING)
     private Date date;

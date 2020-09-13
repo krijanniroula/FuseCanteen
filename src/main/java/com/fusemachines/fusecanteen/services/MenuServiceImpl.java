@@ -3,11 +3,13 @@ package com.fusemachines.fusecanteen.services;
 import com.fusemachines.fusecanteen.models.Menu;
 import com.fusemachines.fusecanteen.repository.MenuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class MenuServiceImpl implements MenuService{
 
     @Autowired
@@ -30,6 +32,6 @@ public class MenuServiceImpl implements MenuService{
 
     @Override
     public Optional<Menu> getMenuByDate(Date date) {
-        return menuRepository.findByDate();
+        return menuRepository.findByDate(date);
     }
 }

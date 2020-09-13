@@ -1,13 +1,13 @@
 package com.fusemachines.fusecanteen.repository;
 
-import com.fusemachines.fusecanteen.models.FoodItems;
+import com.fusemachines.fusecanteen.models.FoodItem;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface FoodItemsRepository extends MongoRepository<FoodItems,String> {
+public interface FoodItemRepository extends MongoRepository<FoodItem,String> {
 
-    Optional<FoodItems> findByName();
+    Optional<FoodItem> findByName(String name);
 }

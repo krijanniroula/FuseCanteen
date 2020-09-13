@@ -6,10 +6,10 @@ import java.util.Optional;
 
 public interface UserService {
     User save(User user);
-    User update(User user);
+    User update(String id,User user);
     List<User> getAllUsers();
-    void deleteUserByEmail(String email);
+    void deleteUserById(String id);
     User getUserByEmail(String email);
-    Optional<User> getUser(String id);
+    Optional<User> getUserById(String id);
 
 }

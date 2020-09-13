@@ -1,7 +1,6 @@
 package com.fusemachines.fusecanteen.models.order;
 
-import com.fusemachines.fusecanteen.models.FoodItems;
-import com.fusemachines.fusecanteen.models.order.OrderStatus;
+import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.user.User;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -19,7 +18,7 @@ public class Order {
     private OrderStatus orderStatus;
 
     @DBRef
-    private FoodItems foodItems;
+    private FoodItem foodItem;
 
     @DBRef
     private User user;

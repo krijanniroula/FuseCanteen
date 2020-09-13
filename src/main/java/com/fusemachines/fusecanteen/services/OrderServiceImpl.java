@@ -4,10 +4,12 @@ import com.fusemachines.fusecanteen.models.order.Order;
 import com.fusemachines.fusecanteen.models.order.OrderStatus;
 import com.fusemachines.fusecanteen.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -30,11 +32,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getOrderByOrderStatus(OrderStatus orderStatus) {
-        return orderRepository.findByOrderStatus();
+        return orderRepository.findByOrderStatus(orderStatus);
     }
 
     @Override
     public List<Order> getOrderByDate(Date date) {
-        return orderRepository.findByDate();
+        return orderRepository.findByDate(date);
     }
 }

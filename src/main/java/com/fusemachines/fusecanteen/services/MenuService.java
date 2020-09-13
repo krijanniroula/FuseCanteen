@@ -1,6 +1,5 @@
 package com.fusemachines.fusecanteen.services;
 
-import com.fusemachines.fusecanteen.models.FoodItems;
 import com.fusemachines.fusecanteen.models.Menu;
 
 import java.util.Date;

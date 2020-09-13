@@ -12,39 +12,42 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/user")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
     @Autowired
     UserService userService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<User> save(@RequestBody User user){
-        userService.save(user);
-        return new ResponseEntity<>(user,HttpStatus.OK);
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        try {
+            return new ResponseEntity<>( userService.save(user),HttpStatus.CREATED);
+        }  catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+       }
     }
 
-    @PutMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<User> update(@RequestBody User user){
-        return new ResponseEntity<>(userService.update(user),HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable String id,@RequestBody User user){
+        return new ResponseEntity<>(userService.update(id,user),HttpStatus.OK);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> getUsersList() {
-        List<User> users = userService.getAllUsers();
-        if (users.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try{
+            List<User> users = userService.getAllUsers();
+            if (users.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(users, HttpStatus.OK);
-
     }
 
-    @GetMapping("/{email}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<User> getUser(@PathVariable String email){
-        User user = userService.getUserByEmail(email);
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable String id){
+        User user = userService.getUserByEmail(id);
         if (user==null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
