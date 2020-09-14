@@ -1,5 +1,6 @@
 package com.fusemachines.fusecanteen.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fusemachines.fusecanteen.models.FoodItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,22 @@ public class OrderResponse {
 
     private LocalDate date;
 
-    private Integer totalPrice;
+    private int totalPrice;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String username;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String fullName;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String mobile;
+
+    public OrderResponse(Set<FoodItem> foodItems,LocalDate date,int totalPrice){
+        this.foodItems=foodItems;
+        this.date=date;
+        this.totalPrice=totalPrice;
+    }
 
 }
 

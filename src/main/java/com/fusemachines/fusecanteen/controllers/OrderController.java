@@ -1,5 +1,7 @@
 package com.fusemachines.fusecanteen.controllers;
 
+import com.fusemachines.fusecanteen.common.CommonUtils;
+import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.order.Order;
 import com.fusemachines.fusecanteen.payload.request.OrderRequest;
@@ -13,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,29 +32,67 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Order>> getAllOrders() {
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
 
-        List<Order> OrderList = orderService.getAllOrder();
-        if (OrderList.isEmpty()){
+        List<OrderResponse> orderResponses = new ArrayList<>();
+
+        List<Order> orderList = orderService.getAllOrder();
+        if (orderList.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(OrderList, HttpStatus.OK);
+        for (Order order : orderList){
+            OrderResponse orderResponse = new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber());
+            orderResponses.add(orderResponse);
+        }
+        return new ResponseEntity<>(orderResponses, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
-    public ResponseEntity<Order> getOrdersById(@PathVariable String id) {
-        Order Order = orderService.getOrderById(id);
-        return new ResponseEntity<>( Order, HttpStatus.OK );
+    @GetMapping("/{date}/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderResponse>> getAllOrdersByDate(@PathVariable String date) {
+
+        List<OrderResponse> orderResponses = new ArrayList<>();
+
+        List<Order> orderList = orderService.getOrderByDate(LocalDate.parse(date));
+        if (orderList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        for (Order order : orderList){
+            OrderResponse orderResponse = new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber());
+            orderResponses.add(orderResponse);
+        }
+        return new ResponseEntity<>(orderResponses, HttpStatus.OK);
+    }
+
+    @GetMapping("/{date}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<?> getOrdersByDate(@PathVariable String date) {
+        Order order = orderService.getOrderByDateUsername( date , CommonUtils.getLoggedUsername() );
+        if (order == null){
+            throw new ResourceNotFoundException("Order not found for date = "+date);
+        }
+        return new ResponseEntity<>(new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order)), HttpStatus.OK );
+
+    }
+
+    @GetMapping("/{date}/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getOrdersByDateUser( @PathVariable String date, @PathVariable String username) {
+        Order order = orderService.getOrderByDateUsername( date , username );
+        if (order == null){
+            throw new ResourceNotFoundException("Order not found for date = "+date);
+        }
+        return new ResponseEntity<>(new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber()), HttpStatus.OK );
 
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
 
         Order order = new Order();
         order.setFoodItem(getFoodItemsFromName(orderRequest));
+        order.setDate(LocalDate.parse(orderRequest.getDate()));
         orderService.save(order);
         return new ResponseEntity<>( new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order)),HttpStatus.CREATED);
     }
@@ -67,21 +108,30 @@ public class OrderController {
         return foodItems;
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
-    public ResponseEntity<?> updateOrder(@PathVariable String id, @RequestBody OrderRequest orderRequest) {
+    @PutMapping("/{date}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<?> updateOrder(@PathVariable String date, @RequestBody OrderRequest orderRequest) {
         Order order = new Order();
         order.setFoodItem( getFoodItemsFromName(orderRequest) );
         order.setDate( LocalDate.parse(orderRequest.getDate()) );
 
-        orderService.update( id, order );
+        orderService.update( date, order );
         return new ResponseEntity<>( new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order)) ,HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
-    public ResponseEntity<HttpStatus> deleteOrderById(@PathVariable String id) {
-        orderService.deleteById(id);
+    @DeleteMapping("/{date}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<HttpStatus> deleteOrderByDate(@PathVariable String date) {
+
+        String username = CommonUtils.getLoggedUsername();
+        orderService.deleteByDateUser( username,date );
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/{date}/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<HttpStatus> deleteOrderByDateUser(@PathVariable String date,@PathVariable String username) {
+        orderService.deleteByDateUser(username,date);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

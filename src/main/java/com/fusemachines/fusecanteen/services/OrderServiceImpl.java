@@ -1,15 +1,14 @@
 package com.fusemachines.fusecanteen.services;
 
+import com.fusemachines.fusecanteen.common.CommonUtils;
 import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.order.Order;
 import com.fusemachines.fusecanteen.models.order.OrderStatus;
 import com.fusemachines.fusecanteen.models.user.User;
 import com.fusemachines.fusecanteen.repository.OrderRepository;
-import com.fusemachines.fusecanteen.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,9 +28,8 @@ public class OrderServiceImpl implements OrderService {
     public Order save(Order order) {
 
         LocalDate localDate = LocalDate.now();
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        String username = userDetails.getUsername();
+
+        String username = CommonUtils.getLoggedUsername();
 
         User user = userService.getUserByUsername(username);
         order.setUser(user);
@@ -54,8 +52,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order update(String id,Order order) {
-        Order orderNew = getOrderById(id);
+    public Order update(String date,Order order) {
+        Order orderNew = getOrderByDateUsername( date,CommonUtils.getLoggedUsername() );
         if (order.getDate()!=null){
             orderNew.setDate(order.getDate());
         }
@@ -79,14 +77,24 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByDate(date);
     }
 
+    public Order getOrderByDateUserId(LocalDate date,String id ) {
+        return orderRepository.findByDateAndUserId( date,id );
+    }
+
     @Override
     public Order getOrderById(String id) {
         return orderRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Order not found with id = "+id));
     }
 
     @Override
-    public void deleteById(String id) {
-        Order order = getOrderById(id);
-        orderRepository.delete(order);
+    public Order getOrderByDateUsername(String date, String username){
+        User user =userService.getUserByUsername(username);
+        Order order = getOrderByDateUserId( LocalDate.parse(date),user.getId() );
+        return order;
+    }
+
+    @Override
+    public void deleteByDateUser(String username,String date) {
+        orderRepository.delete( getOrderByDateUsername(date,username) );
     }
 }
