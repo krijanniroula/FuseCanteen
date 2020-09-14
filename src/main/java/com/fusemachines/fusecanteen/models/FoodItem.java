@@ -17,6 +17,6 @@ public class FoodItem {
     @Indexed(unique = true, direction = IndexDirection.DESCENDING)
     private String name;
 
-    private Integer price;
+    private int price;
 
 }

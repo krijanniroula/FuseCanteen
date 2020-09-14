@@ -25,8 +25,8 @@ public class Order {
     @DBRef
     private User user;
 
-    private LocalDate date;
+    private int totalPrice;
 
-    private String description;
+    private LocalDate date;
 
 }

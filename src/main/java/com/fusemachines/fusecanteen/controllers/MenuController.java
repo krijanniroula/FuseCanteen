@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +41,7 @@ public class MenuController {
 
     @GetMapping("/{date}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Menu> getMenusByDate(@PathVariable String date) throws ParseException {
+    public ResponseEntity<Menu> getMenusByDate(@PathVariable String date) {
         LocalDate localDate = LocalDate.parse(date);
         Menu menu = menuService.getMenuByDate( localDate );
         if (menu == null){
@@ -54,7 +53,7 @@ public class MenuController {
 
     @GetMapping("/today")
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<Menu> getMenusForToday() throws ParseException {
+    public ResponseEntity<Menu> getMenusForToday() {
 
         LocalDate localDate = LocalDate.now();
 
@@ -68,7 +67,7 @@ public class MenuController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createMenu(@RequestBody MenuRequest menuRequest) throws ParseException {
+    public ResponseEntity<?> createMenu(@RequestBody MenuRequest menuRequest) {
 
        LocalDate localDate = LocalDate.now();
 
@@ -80,8 +79,7 @@ public class MenuController {
 
         Menu menu = new Menu(localDate);
         menu.setFoodItems(getFoodItemsFromName(menuRequest));
-        menuService.save(menu);
-        return new ResponseEntity<>( HttpStatus.CREATED);
+        return new ResponseEntity<>(menuService.save(menu),HttpStatus.CREATED);
     }
 
     public Set<FoodItem> getFoodItemsFromName(MenuRequest request) {
@@ -97,7 +95,7 @@ public class MenuController {
 
     @PutMapping("/{date}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Menu> updateMenu(@PathVariable String date, @RequestBody MenuRequest menuRequest) throws ParseException {
+    public ResponseEntity<Menu> updateMenu(@PathVariable String date, @RequestBody MenuRequest menuRequest) {
 
         Set<FoodItem> foodItemSet = getFoodItemsFromName(menuRequest);
         return new ResponseEntity<>( menuService.update(date,foodItemSet),HttpStatus.OK);

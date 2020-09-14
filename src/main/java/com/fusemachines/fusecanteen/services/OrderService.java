@@ -13,6 +13,7 @@ public interface OrderService {
     List<Order> getAllOrder();
     List<Order> getOrderByOrderStatus(OrderStatus orderStatus);
     List<Order> getOrderByDate(LocalDate date);
+    int getTotalPrice(Order order);
     Order getOrderById(String id);
     void deleteById(String id);
 }

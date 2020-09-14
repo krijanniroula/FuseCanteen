@@ -7,7 +7,6 @@ import com.fusemachines.fusecanteen.repository.MenuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +23,7 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public Menu update(String date, Set<FoodItem> foodItems) throws ParseException {
+    public Menu update(String date, Set<FoodItem> foodItems) {
 
         Menu menuNew = getMenuByDate(LocalDate.parse(date));
         menuNew.setFoodItems(foodItems);
