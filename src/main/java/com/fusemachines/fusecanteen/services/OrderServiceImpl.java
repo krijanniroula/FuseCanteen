@@ -1,6 +1,6 @@
 package com.fusemachines.fusecanteen.services;
 
-import com.fusemachines.fusecanteen.common.CommonUtils;
+import com.fusemachines.fusecanteen.common.Utils;
 import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.order.Order;
@@ -29,11 +29,11 @@ public class OrderServiceImpl implements OrderService {
 
         LocalDate localDate = LocalDate.now();
 
-        String username = CommonUtils.getLoggedUsername();
+        String username = Utils.getLoggedUsername();
 
         User user = userService.getUserByUsername(username);
         order.setUser(user);
-        order.setOrderStatus(OrderStatus.INPROCESS);
+        order.setOrderStatus(OrderStatus.PENDING);
         if (order.getDate()==null){
             order.setDate(localDate);
         }
@@ -53,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order update(String date,Order order) {
-        Order orderNew = getOrderByDateUsername( date,CommonUtils.getLoggedUsername() );
+        Order orderNew = getOrderByDateUsername( date, Utils.getLoggedUsername() );
         if (order.getDate()!=null){
             orderNew.setDate(order.getDate());
         }

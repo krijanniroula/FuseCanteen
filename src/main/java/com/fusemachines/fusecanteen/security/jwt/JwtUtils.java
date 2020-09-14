@@ -1,6 +1,6 @@
 package com.fusemachines.fusecanteen.security.jwt;
 
-import com.fusemachines.fusecanteen.security.services.UserDetailsImpl;
+import com.fusemachines.fusecanteen.security.user.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;

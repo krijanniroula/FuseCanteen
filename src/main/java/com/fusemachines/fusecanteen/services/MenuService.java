@@ -11,7 +11,7 @@ public interface MenuService {
     Menu save(Menu menu);
     Menu update(String date, Set<FoodItem> foodItems) ;
     List<Menu> getAllMenu();
-    Menu getMenuByDate(LocalDate date);
+    Menu getMenuByDate(String date);
     Menu getMenuById(String id);
     void deleteById(String id);
 }

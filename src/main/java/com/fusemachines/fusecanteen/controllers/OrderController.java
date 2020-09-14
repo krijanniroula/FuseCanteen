@@ -1,6 +1,6 @@
 package com.fusemachines.fusecanteen.controllers;
 
-import com.fusemachines.fusecanteen.common.CommonUtils;
+import com.fusemachines.fusecanteen.common.Utils;
 import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.order.Order;
@@ -41,8 +41,7 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         for (Order order : orderList){
-            OrderResponse orderResponse = new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber());
-            orderResponses.add(orderResponse);
+            orderResponses.add(getOrderResponceAdmin(order));
         }
         return new ResponseEntity<>(orderResponses, HttpStatus.OK);
     }
@@ -58,8 +57,7 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         for (Order order : orderList){
-            OrderResponse orderResponse = new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber());
-            orderResponses.add(orderResponse);
+            orderResponses.add(getOrderResponceAdmin(order));
         }
         return new ResponseEntity<>(orderResponses, HttpStatus.OK);
     }
@@ -67,11 +65,11 @@ public class OrderController {
     @GetMapping("/{date}")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<?> getOrdersByDate(@PathVariable String date) {
-        Order order = orderService.getOrderByDateUsername( date , CommonUtils.getLoggedUsername() );
+        Order order = orderService.getOrderByDateUsername( date , Utils.getLoggedUsername() );
         if (order == null){
             throw new ResourceNotFoundException("Order not found for date = "+date);
         }
-        return new ResponseEntity<>(new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order)), HttpStatus.OK );
+        return new ResponseEntity<>( getOrderResponceEmployee(order), HttpStatus.OK );
 
     }
 
@@ -82,7 +80,7 @@ public class OrderController {
         if (order == null){
             throw new ResourceNotFoundException("Order not found for date = "+date);
         }
-        return new ResponseEntity<>(new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber()), HttpStatus.OK );
+        return new ResponseEntity<>(getOrderResponceAdmin(order), HttpStatus.OK );
 
     }
 
@@ -94,7 +92,7 @@ public class OrderController {
         order.setFoodItem(getFoodItemsFromName(orderRequest));
         order.setDate(LocalDate.parse(orderRequest.getDate()));
         orderService.save(order);
-        return new ResponseEntity<>( new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order)),HttpStatus.CREATED);
+        return new ResponseEntity<>( getOrderResponceEmployee(order), HttpStatus.CREATED);
     }
 
     public Set<FoodItem> getFoodItemsFromName(OrderRequest request) {
@@ -116,14 +114,14 @@ public class OrderController {
         order.setDate( LocalDate.parse(orderRequest.getDate()) );
 
         orderService.update( date, order );
-        return new ResponseEntity<>( new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order)) ,HttpStatus.OK);
+        return new ResponseEntity<>( getOrderResponceEmployee(order) ,HttpStatus.OK);
     }
 
     @DeleteMapping("/{date}")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<HttpStatus> deleteOrderByDate(@PathVariable String date) {
 
-        String username = CommonUtils.getLoggedUsername();
+        String username = Utils.getLoggedUsername();
         orderService.deleteByDateUser( username,date );
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -133,5 +131,13 @@ public class OrderController {
     public ResponseEntity<HttpStatus> deleteOrderByDateUser(@PathVariable String date,@PathVariable String username) {
         orderService.deleteByDateUser(username,date);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    public OrderResponse getOrderResponceAdmin(Order order){
+        return new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber());
+    }
+
+    public OrderResponse getOrderResponceEmployee(Order order){
+        return  new OrderResponse(order.getFoodItem(),order.getDate(),orderService.getTotalPrice(order));
     }
 }

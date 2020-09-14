@@ -1,4 +1,4 @@
-package com.fusemachines.fusecanteen.security.services;
+package com.fusemachines.fusecanteen.security.user;
 
 import com.fusemachines.fusecanteen.models.user.User;
 import com.fusemachines.fusecanteen.repository.UserRepository;

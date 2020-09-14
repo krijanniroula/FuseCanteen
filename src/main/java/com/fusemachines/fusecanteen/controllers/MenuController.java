@@ -42,10 +42,10 @@ public class MenuController {
     @GetMapping("/{date}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Menu> getMenusByDate(@PathVariable String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        Menu menu = menuService.getMenuByDate( localDate );
+
+        Menu menu = menuService.getMenuByDate( date );
         if (menu == null){
-            throw new ResourceNotFoundException("Menu not found for date = "+localDate);
+            throw new ResourceNotFoundException("Menu not found for date = "+date);
         }
         return new ResponseEntity<>( menu, HttpStatus.OK );
 
@@ -55,9 +55,7 @@ public class MenuController {
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Menu> getMenusForToday() {
 
-        LocalDate localDate = LocalDate.now();
-
-        Menu menu = menuService.getMenuByDate( localDate );
+        Menu menu = menuService.getMenuByDate( LocalDate.now().toString() );
         if (menu == null){
             throw new ResourceNotFoundException("Menu not found for today!");
         }
@@ -71,13 +69,13 @@ public class MenuController {
 
        LocalDate localDate = LocalDate.now();
 
-        if ((menuService.getMenuByDate(localDate)) != null) {
+        if ((menuService.getMenuByDate(LocalDate.now().toString())) != null) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Menu for the date "+localDate+" is already created!"));
         }
 
-        Menu menu = new Menu(localDate);
+        Menu menu = new Menu( localDate );
         menu.setFoodItems(getFoodItemsFromName(menuRequest));
         return new ResponseEntity<>(menuService.save(menu),HttpStatus.CREATED);
     }

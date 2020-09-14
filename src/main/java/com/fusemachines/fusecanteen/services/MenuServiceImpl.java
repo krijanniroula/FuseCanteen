@@ -25,7 +25,7 @@ public class MenuServiceImpl implements MenuService{
     @Override
     public Menu update(String date, Set<FoodItem> foodItems) {
 
-        Menu menuNew = getMenuByDate(LocalDate.parse(date));
+        Menu menuNew = getMenuByDate(date);
         menuNew.setFoodItems(foodItems);
         return menuRepository.save(menuNew);
     }
@@ -36,8 +36,8 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public Menu getMenuByDate(LocalDate date) {
-        Menu menu = menuRepository.findByDate(date);
+    public Menu getMenuByDate(String date) {
+        Menu menu = menuRepository.findByDate(LocalDate.parse(date));
         return menu;
     }
 

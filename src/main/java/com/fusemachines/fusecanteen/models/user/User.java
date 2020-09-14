@@ -1,5 +1,6 @@
 package com.fusemachines.fusecanteen.models.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.IndexDirection;
@@ -17,11 +18,13 @@ public class User {
     @Id
     private String id;
 
+    @Indexed(unique = true)
     private String username;
 
     @Indexed(unique = true, direction = IndexDirection.DESCENDING)
     private String email;
 
+    @JsonIgnore
     private String password;
 
     private String firstName;
