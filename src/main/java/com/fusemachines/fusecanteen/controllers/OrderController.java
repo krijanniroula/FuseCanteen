@@ -62,6 +62,12 @@ public class OrderController {
         return new ResponseEntity<>(orderService.updateOrder( date, orderRequest ) ,HttpStatus.OK);
     }
 
+    @PutMapping("/{date}/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateOrder(@PathVariable String date, @PathVariable String username, @RequestBody OrderRequest orderRequest) {
+        return new ResponseEntity<>(orderService.updateOrderStatus( date, username,orderRequest.getStatus() ) ,HttpStatus.OK);
+    }
+
     @DeleteMapping("/{date}")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<HttpStatus> deleteOrderByDate(@PathVariable String date) {

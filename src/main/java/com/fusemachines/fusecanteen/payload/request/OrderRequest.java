@@ -15,4 +15,6 @@ public class OrderRequest {
     private Set<String> foodItems =  new HashSet<>();
 
     private String date;
+
+    private String status;
 }
