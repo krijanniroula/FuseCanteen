@@ -14,4 +14,5 @@ public interface FoodRequestRepository extends MongoRepository<FoodRequest,Strin
     FoodRequest findByName(String name);
     List<FoodRequest> findByDate(LocalDate date);
     List<FoodRequest> findByUser(User user);
+    List<FoodRequest> findByDateAndUserId(LocalDate date, String userId);
 }

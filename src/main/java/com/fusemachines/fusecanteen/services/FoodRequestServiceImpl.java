@@ -6,7 +6,6 @@ import com.fusemachines.fusecanteen.models.FoodRequest;
 import com.fusemachines.fusecanteen.models.user.User;
 import com.fusemachines.fusecanteen.payload.response.FoodRequestPopularity;
 import com.fusemachines.fusecanteen.payload.response.FoodRequestResponse;
-import com.fusemachines.fusecanteen.payload.response.MessageResponse;
 import com.fusemachines.fusecanteen.repository.FoodRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -52,8 +51,9 @@ public class FoodRequestServiceImpl implements FoodRequestService{
     }
 
     @Override
-    public List<FoodRequest> getAllFoodRequests() {
-        return foodRequestRepository.findAll();
+    public List<FoodRequestResponse> getAllFoodRequests() {
+        List<FoodRequest> foodRequests = foodRequestRepository.findAll();
+        return getFoodRequestResponseAdminList(foodRequests);
     }
 
     @Override
@@ -74,6 +74,41 @@ public class FoodRequestServiceImpl implements FoodRequestService{
     @Override
     public List<FoodRequest> getFoodRequestByDate(LocalDate date) {
         return foodRequestRepository.findByDate(date);
+    }
+
+    @Override
+    public List<FoodRequestResponse> getFoodRequestForToday(){
+
+        List<FoodRequest> foodRequestList;
+        User user = userService.getUserByUsername(Utils.getLoggedUsername());
+
+        if ( Utils.userHasRoleAdmin(user) ){
+            foodRequestList = getFoodRequestByDate(LocalDate.now());
+            return getFoodRequestResponseAdminList(foodRequestList);
+        } else {
+            foodRequestList = foodRequestRepository.findByDateAndUserId(LocalDate.now(),user.getId());
+            return getFoodRequestResponseEmployeeList(foodRequestList);
+        }
+
+    }
+
+    public List<FoodRequestResponse> getFoodRequestResponseAdminList(List<FoodRequest> foodRequestList){
+        List<FoodRequestResponse> foodRequestResponseList = new ArrayList<>();
+
+        for(FoodRequest foodRequest : foodRequestList){
+            FoodRequestResponse foodRequestResponse = new FoodRequestResponse(foodRequest.getName(),foodRequest.getDate(),foodRequest.getUser().getUsername(),foodRequest.getUser().getFullName(),foodRequest.getUser().getMobileNumber());
+            foodRequestResponseList.add(foodRequestResponse);
+        }
+        return foodRequestResponseList;
+    }
+
+    public List<FoodRequestResponse> getFoodRequestResponseEmployeeList(List<FoodRequest> foodRequestList){
+        List<FoodRequestResponse> foodRequestResponseList = new ArrayList<>();
+        for(FoodRequest foodRequest : foodRequestList){
+            FoodRequestResponse foodRequestResponse = new FoodRequestResponse(foodRequest.getName(),foodRequest.getDate());
+            foodRequestResponseList.add(foodRequestResponse);
+        }
+        return foodRequestResponseList;
     }
 
     @Override
@@ -109,4 +144,21 @@ public class FoodRequestServiceImpl implements FoodRequestService{
         List<FoodRequest> foodRequests = foodRequestRepository.findByUser(user);
         return foodRequests;
     }
-}
+
+    @Override
+    public List<FoodRequestResponse> getAllFoodRequestsByLogInUser(){
+        List<FoodRequest> foodRequests = getFoodRequestByUsername( Utils.getLoggedUsername());
+        return getFoodRequestResponseEmployeeList(foodRequests);
+    }
+
+    @Override
+    public List<FoodRequestResponse> getAllFoodRequestsDynamic(){
+        User user = userService.getUserByUsername(Utils.getLoggedUsername());
+        if (Utils.userHasRoleAdmin(user)){
+            return getAllFoodRequests();
+        } else {
+            return getAllFoodRequestsByLogInUser();
+        }
+    }
+
+ }

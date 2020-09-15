@@ -6,12 +6,15 @@ import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.order.Order;
 import com.fusemachines.fusecanteen.models.order.OrderStatus;
 import com.fusemachines.fusecanteen.models.user.User;
+import com.fusemachines.fusecanteen.payload.request.OrderRequest;
+import com.fusemachines.fusecanteen.payload.response.OrderResponse;
 import com.fusemachines.fusecanteen.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,21 +27,26 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    FoodItemService foodItemService;
+
     @Override
-    public Order save(Order order) {
+    public OrderResponse createNewOrder(OrderRequest orderRequest) {
 
-        LocalDate localDate = LocalDate.now();
+        Order order = new Order();
+        order.setFoodItem( getFoodItemsFromName(orderRequest) );
+        order.setDate(LocalDate.parse(orderRequest.getDate()));
 
-        String username = Utils.getLoggedUsername();
-
-        User user = userService.getUserByUsername(username);
+        User user = userService.getUserByUsername(Utils.getLoggedUsername());
+        // set logged in user to order request
         order.setUser(user);
+
         order.setOrderStatus(OrderStatus.PENDING);
-        if (order.getDate()==null){
-            order.setDate(localDate);
+        if (orderRequest.getDate()==null){
+            order.setDate(LocalDate.now());
         }
         order.setTotalPrice(getTotalPrice(order));
-        return orderRepository.save(order);
+        return getOrderResponceEmployee(orderRepository.save(order));
     }
 
     @Override
@@ -52,19 +60,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order update(String date,Order order) {
-        Order orderNew = getOrderByDateUsername( date, Utils.getLoggedUsername() );
-        if (order.getDate()!=null){
-            orderNew.setDate(order.getDate());
+    public OrderResponse updateOrder(String date,OrderRequest orderRequest) {
+
+        Order order = getOrderByDateUsername( date, Utils.getLoggedUsername() );
+        if (order == null){
+            throw new ResourceNotFoundException("Order not found for date = "+date);
         }
-        orderNew.setFoodItem(order.getFoodItem());
-        orderNew.setTotalPrice(getTotalPrice(order));
-        return orderRepository.save(orderNew);
+        order.setFoodItem( getFoodItemsFromName(orderRequest) );
+        return getOrderResponceEmployee(orderRepository.save(order));
     }
 
     @Override
-    public List<Order> getAllOrder() {
-        return orderRepository.findAll();
+    public List<OrderResponse> getAllOrder() {
+        return getOrderResponceAdminList(orderRepository.findAll());
     }
 
     @Override
@@ -87,6 +95,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Object getOrderByDateDynamic(String date){
+        User user = userService.getUserByUsername(Utils.getLoggedUsername());
+        if (Utils.userHasRoleAdmin(user)){
+            List<Order> orderList = getOrderByDate(LocalDate.parse(date));
+            return getOrderResponceAdminList(orderList);
+        } else {
+            Order order = getOrderByDateUsername(date, Utils.getLoggedUsername());
+            if (order==null){
+                return new OrderResponse();
+            }
+            return getOrderResponceEmployee(order);
+        }
+    }
+
+    @Override
     public Order getOrderByDateUsername(String date, String username){
         User user =userService.getUserByUsername(username);
         Order order = getOrderByDateUserId( LocalDate.parse(date),user.getId() );
@@ -94,7 +117,56 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderResponse getOrderForAdmin(String date, String username){
+        Order order = getOrderByDateUsername( date , username );
+        if (order == null){
+            return new OrderResponse();
+        }
+        return getOrderResponceAdmin(order);
+    }
+
+    @Override
     public void deleteByDateUser(String username,String date) {
-        orderRepository.delete( getOrderByDateUsername(date,username) );
+        Order order = getOrderByDateUsername(date,username);
+        if (order == null){
+            throw new ResourceNotFoundException("Order not found for date = "+date +" and username = "+username);
+        }
+        orderRepository.delete( order );
+    }
+
+    public OrderResponse getOrderResponceAdmin(Order order){
+        return new OrderResponse(order.getFoodItem(),order.getDate(),getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber());
+    }
+
+    public List<OrderResponse> getOrderResponceAdminList(List<Order> orderList){
+
+        List<OrderResponse> orderResponses = new ArrayList<>();
+
+        if (orderList.isEmpty()){
+            return orderResponses;
+        }
+
+        for (Order order : orderList){
+            orderResponses.add(getOrderResponceAdmin(order));
+        }
+        return orderResponses;
+    }
+
+    public OrderResponse getOrderResponceEmployee(Order order){
+        return new OrderResponse(order.getFoodItem(),order.getDate(),getTotalPrice(order));
+    }
+
+    /*
+    *  return set of FoodItem from orderRequest
+    * */
+    public Set<FoodItem> getFoodItemsFromName(OrderRequest request) {
+        Set<String> foodItemNames = request.getFoodItems();
+        Set<FoodItem> foodItems = new HashSet<>();
+
+        foodItemNames.forEach(name -> {
+            FoodItem foodItem = foodItemService.getFoodItemByName(name);
+            foodItems.add(foodItem);
+        });
+        return foodItems;
     }
 }

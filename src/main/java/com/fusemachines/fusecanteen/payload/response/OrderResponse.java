@@ -2,10 +2,7 @@ package com.fusemachines.fusecanteen.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fusemachines.fusecanteen.models.FoodItem;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -14,10 +11,12 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class OrderResponse {
 
     private Set<FoodItem> foodItems;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate date;
 
     private int totalPrice;

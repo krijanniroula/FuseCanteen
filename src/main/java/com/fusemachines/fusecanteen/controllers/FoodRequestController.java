@@ -1,6 +1,5 @@
 package com.fusemachines.fusecanteen.controllers;
 
-import com.fusemachines.fusecanteen.common.Utils;
 import com.fusemachines.fusecanteen.models.FoodRequest;
 
 import com.fusemachines.fusecanteen.payload.response.FoodRequestResponse;
@@ -11,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,28 +20,17 @@ public class FoodRequestController {
     FoodRequestService foodRequestService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     public ResponseEntity<?> getAllFoodRequests() {
-
-        List<FoodRequest> foodRequestList = foodRequestService.getAllFoodRequests();
-        List<FoodRequestResponse> foodRequestResponseList = getFoodRequestResponseAdmin(foodRequestList);
-
-        if (foodRequestResponseList.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+        List<FoodRequestResponse> foodRequestResponseList = foodRequestService.getAllFoodRequestsDynamic();
         return new ResponseEntity<>(foodRequestResponseList, HttpStatus.OK);
     }
 
     @GetMapping("/today")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     public ResponseEntity<?> getAllFoodRequestsForToday() {
 
-        List<FoodRequest> foodRequestList = foodRequestService.getFoodRequestByDate(LocalDate.now());
-        List<FoodRequestResponse> foodRequestResponseList = getFoodRequestResponseAdmin(foodRequestList);
-
-        if (foodRequestResponseList.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+        List<FoodRequestResponse> foodRequestResponseList = foodRequestService.getFoodRequestForToday();
         return new ResponseEntity<>(foodRequestResponseList, HttpStatus.OK);
     }
 
@@ -53,27 +39,7 @@ public class FoodRequestController {
     public ResponseEntity<?> getAllFoodRequestsForTodayPopular() {
 
         List<FoodRequestResponse> foodRequestResponseList = foodRequestService.getFoodRequestByPopularity();
-        if (foodRequestResponseList.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
         return new ResponseEntity<>(foodRequestResponseList, HttpStatus.OK);
-    }
-
-    @GetMapping("/all")
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<?> getAllFoodRequestsByLoggedInUser() {
-        List<FoodRequestResponse> foodRequestResponseList = new ArrayList<>();
-        List<FoodRequest> foodRequests = foodRequestService.getFoodRequestByUsername( Utils.getLoggedUsername());
-        if (foodRequests.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        for(FoodRequest foodRequest : foodRequests){
-            FoodRequestResponse foodRequestResponse = getFoodRequestResponseEmployee(foodRequest);
-            foodRequestResponseList.add(foodRequestResponse);
-        }
-
-        return new ResponseEntity<>( foodRequestResponseList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -105,17 +71,8 @@ public class FoodRequestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    public List<FoodRequestResponse> getFoodRequestResponseAdmin(List<FoodRequest> foodRequestList){
-        List<FoodRequestResponse> foodRequestResponseList = new ArrayList<>();
-
-        for(FoodRequest foodRequest : foodRequestList){
-            FoodRequestResponse foodRequestResponse = new FoodRequestResponse(foodRequest.getName(),foodRequest.getDate(),foodRequest.getUser().getUsername(),foodRequest.getUser().getFullName(),foodRequest.getUser().getMobileNumber());
-            foodRequestResponseList.add(foodRequestResponse);
-        }
-        return foodRequestResponseList;
-    }
-
     public FoodRequestResponse getFoodRequestResponseEmployee(FoodRequest foodRequest){
         return new FoodRequestResponse(foodRequest.getName(),foodRequest.getDate());
     }
+
 }
