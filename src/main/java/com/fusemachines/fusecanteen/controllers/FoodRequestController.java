@@ -79,7 +79,7 @@ public class FoodRequestController {
     }
 
     public FoodRequestResponse getFoodRequestResponseEmployee(FoodRequest foodRequest){
-        return new FoodRequestResponse(foodRequest.getName(),foodRequest.getDate());
+        return new FoodRequestResponse(foodRequest.getId(),foodRequest.getName(),foodRequest.getDate());
     }
 
 }

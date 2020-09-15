@@ -67,7 +67,12 @@ public class FoodRequestServiceImpl implements FoodRequestService{
 
     @Override
     public FoodRequest getFoodRequestByid(String id) {
-        return foodRequestRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Food Request not found with id = "+id));
+        User user = userService.getUserByUsername(Utils.getLoggedUsername());
+        FoodRequest foodRequest = foodRequestRepository.findByIdAndUser(id,user);
+        if (foodRequest==null){
+            throw new ResourceNotFoundException("Food request not found with id = "+id);
+        }
+        return foodRequest;
     }
 
     @Override
@@ -109,7 +114,7 @@ public class FoodRequestServiceImpl implements FoodRequestService{
     public List<FoodRequestResponse> getFoodRequestResponseEmployeeList(List<FoodRequest> foodRequestList){
         List<FoodRequestResponse> foodRequestResponseList = new ArrayList<>();
         for(FoodRequest foodRequest : foodRequestList){
-            FoodRequestResponse foodRequestResponse = new FoodRequestResponse(foodRequest.getName(),foodRequest.getDate());
+            FoodRequestResponse foodRequestResponse = new FoodRequestResponse(foodRequest.getId(),foodRequest.getName(),foodRequest.getDate());
             foodRequestResponseList.add(foodRequestResponse);
         }
         return foodRequestResponseList;

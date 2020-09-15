@@ -16,6 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 public class FoodRequestResponse {
 
+   @JsonInclude(JsonInclude.Include.NON_NULL)
+   private String id;
+
    private String name;
 
    @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -50,7 +53,8 @@ public class FoodRequestResponse {
       this.requestCount=count;
    }
 
-   public FoodRequestResponse(String name, LocalDate date){
+   public FoodRequestResponse(String id,String name, LocalDate date){
+      this.id=id;
       this.name=name;
       this.date=date;
    }

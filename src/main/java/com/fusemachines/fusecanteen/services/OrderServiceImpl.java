@@ -64,9 +64,6 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse updateOrder(String date,OrderRequest orderRequest) {
 
         Order order = getOrderByDateUsername( date, Utils.getLoggedUsername() );
-        if (order == null){
-            throw new ResourceNotFoundException("Order not found for date = "+date);
-        }
         order.setFoodItem( getFoodItemsFromName(orderRequest) );
         return getOrderResponceEmployee(orderRepository.save(order));
     }
@@ -118,9 +115,6 @@ public class OrderServiceImpl implements OrderService {
             return getOrderResponceAdminList(orderList);
         } else {
             Order order = getOrderByDateUsername(date, Utils.getLoggedUsername());
-            if (order==null){
-                return new ResourceNotFoundException("Order not found with date = "+date);
-            }
             return getOrderResponceEmployee(order);
         }
     }
@@ -129,6 +123,9 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderByDateUsername(String date, String username){
         User user =userService.getUserByUsername(username);
         Order order = getOrderByDateUserId( LocalDate.parse(date),user.getId() );
+        if (order==null){
+            throw  new ResourceNotFoundException("Order not found with date = "+date +" and username = "+username);
+        }
         return order;
     }
 
@@ -141,9 +138,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteByDateUser(String username,String date) {
         Order order = getOrderByDateUsername(date,username);
-        if (order == null){
-            throw new ResourceNotFoundException("Order not found for date = "+date +" and username = "+username);
-        }
         orderRepository.delete( order );
     }
 

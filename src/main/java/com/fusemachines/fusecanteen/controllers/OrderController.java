@@ -53,14 +53,12 @@ public class OrderController {
     @PostMapping
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
-
         return new ResponseEntity<>( orderService.createNewOrder(orderRequest), HttpStatus.CREATED);
     }
 
     @PutMapping("/{date}")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<?> updateOrder(@PathVariable String date, @RequestBody OrderRequest orderRequest) {
-
         return new ResponseEntity<>(orderService.updateOrder( date, orderRequest ) ,HttpStatus.OK);
     }
 
@@ -68,8 +66,7 @@ public class OrderController {
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<HttpStatus> deleteOrderByDate(@PathVariable String date) {
 
-        String username = Utils.getLoggedUsername();
-        orderService.deleteByDateUser( username,date );
+        orderService.deleteByDateUser( Utils.getLoggedUsername(),date );
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
