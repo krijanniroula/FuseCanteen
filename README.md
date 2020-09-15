@@ -68,6 +68,9 @@ If signup is for admin role, add "roles":["admin"] to above.
     GET       localhost:8080/api/order/<date>               - retrieve all order list by date entered
     GET       localhost:8080/api/order/<date>/<username>    - retrieve order by date and username entered
     DELETE    localhost:8080/api/order/<date>/<username>    - Delete order by date and username entered
+    
+    PUT       localhost:8080/api/order/<date>/<username>    - Update orderStatus by date and username
+    						   {  "status":"INPROCESS" }
    
  EMPLOYEE : 
 
