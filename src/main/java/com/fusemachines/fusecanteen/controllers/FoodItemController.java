@@ -38,7 +38,7 @@ public class FoodItemController {
 
     @PostMapping
     public ResponseEntity<?> createFoodItem(@RequestBody FoodItem foodItem) {
-        if (foodItemService.getFoodItemByName(foodItem.getName()) != null) {
+        if (foodItemService.existsByName(foodItem.getName())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Food Item with name "+foodItem.getName()+" is already created!"));
@@ -47,7 +47,12 @@ public class FoodItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FoodItem> updateFoodItem(@PathVariable String id, @RequestBody FoodItem foodItem) {
+    public ResponseEntity<?> updateFoodItem(@PathVariable String id, @RequestBody FoodItem foodItem) {
+        if (foodItemService.existsByName(foodItem.getName())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Food Item with name "+foodItem.getName()+" is already created!"));
+        }
         FoodItem foodItemNew = foodItemService.update(id,foodItem);
         return new ResponseEntity<>( foodItemNew,HttpStatus.OK);
     }

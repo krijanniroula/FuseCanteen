@@ -69,13 +69,13 @@ public class MenuController {
 
        LocalDate localDate = LocalDate.now();
 
-        if ((menuService.getMenuByDate(LocalDate.now().toString())) != null) {
+        if ( ( menuService.existsByDate(localDate) ) ) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Menu for the date "+localDate+" is already created!"));
         }
 
-        Menu menu = new Menu( localDate );
+        Menu menu = new Menu(localDate);
         menu.setFoodItems(getFoodItemsFromName(menuRequest));
         return new ResponseEntity<>(menuService.save(menu),HttpStatus.CREATED);
     }
@@ -99,10 +99,10 @@ public class MenuController {
         return new ResponseEntity<>( menuService.update(date,foodItemSet),HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{date}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> deleteMenuById(@PathVariable String id) {
-        menuService.deleteById(id);
+    public ResponseEntity<HttpStatus> deleteMenuById(@PathVariable String date) {
+        menuService.deleteByDate(date);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

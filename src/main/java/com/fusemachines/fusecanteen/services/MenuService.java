@@ -14,4 +14,6 @@ public interface MenuService {
     Menu getMenuByDate(String date);
     Menu getMenuById(String id);
     void deleteById(String id);
+    void deleteByDate(String date);
+    Boolean existsByDate(LocalDate date);
 }

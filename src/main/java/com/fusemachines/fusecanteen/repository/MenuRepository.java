@@ -10,4 +10,5 @@ import java.time.LocalDate;
 public interface MenuRepository extends MongoRepository<Menu,String> {
 
     Menu findByDate(LocalDate date);
+    Boolean existsByDate(LocalDate date);
 }

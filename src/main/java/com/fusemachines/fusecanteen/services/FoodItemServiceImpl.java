@@ -49,4 +49,9 @@ public class FoodItemServiceImpl implements FoodItemService {
         FoodItem foodItem = getFoodItemByid(id);
         foodItemRepository.delete(foodItem);
     }
+
+    @Override
+    public Boolean existsByName(String name) {
+        return foodItemRepository.existsByName(name);
+    }
 }

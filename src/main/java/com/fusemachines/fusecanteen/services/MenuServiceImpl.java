@@ -52,4 +52,15 @@ public class MenuServiceImpl implements MenuService{
         Menu menu = getMenuById(id);
         menuRepository.delete(menu);
     }
+
+    @Override
+    public void deleteByDate(String date) {
+        Menu menu = getMenuByDate(date);
+        menuRepository.delete(menu);
+    }
+
+    @Override
+    public Boolean existsByDate(LocalDate date) {
+        return menuRepository.existsByDate(date);
+    }
 }

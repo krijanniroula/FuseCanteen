@@ -11,4 +11,5 @@ public interface FoodItemService {
     FoodItem getFoodItemByName(String name);
     FoodItem getFoodItemByid(String id);
     void deleteById(String id);
+    Boolean existsByName(String name);
 }
