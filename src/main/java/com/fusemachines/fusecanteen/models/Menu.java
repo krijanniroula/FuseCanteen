@@ -27,8 +27,4 @@ public class Menu {
     @Indexed(unique = true, direction = IndexDirection.DESCENDING)
     private LocalDate date;
 
-    public Menu(LocalDate date){
-        this.date = date;
-    }
-
 }

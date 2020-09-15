@@ -7,6 +7,7 @@ import com.fusemachines.fusecanteen.payload.request.MenuRequest;
 import com.fusemachines.fusecanteen.repository.MenuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -24,8 +25,19 @@ public class MenuServiceImpl implements MenuService{
 
     @Override
     public Menu createMenu(MenuRequest menuRequest) {
-        Menu menu = new Menu(LocalDate.now());
+        Menu menu = new Menu();
+
         menu.setFoodItems( getFoodItemsFromName(menuRequest) );
+        if (menuRequest.getDate()==null){
+            menu.setDate(LocalDate.now());
+        } else {
+            menu.setDate(menuRequest.getDate());
+        }
+
+        // returns null if menu for the date is already created
+        if (existsByDate(menu.getDate())){
+            return null;
+        }
         return menuRepository.save(menu);
     }
 

@@ -3,6 +3,7 @@ package com.fusemachines.fusecanteen.payload.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,5 +12,7 @@ import java.util.Set;
 public class MenuRequest {
 
     private Set<String> foodItems =  new HashSet<>();
+
+    private LocalDate date;
 
 }

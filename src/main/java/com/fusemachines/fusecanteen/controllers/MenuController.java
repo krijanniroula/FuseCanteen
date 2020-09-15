@@ -49,19 +49,22 @@ public class MenuController {
 
     }
 
+    private LocalDate getDate(MenuRequest menuRequest){
+        return menuRequest.getDate()==null ? LocalDate.now() : menuRequest.getDate();
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createMenu(@RequestBody MenuRequest menuRequest) {
 
-       LocalDate localDate = LocalDate.now();
-
-        if ( ( menuService.existsByDate(localDate) ) ) {
+        Menu menu = menuService.createMenu(menuRequest);
+        if ( menu == null ) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Menu for the date "+localDate+" is already created!"));
+                    .body(new MessageResponse("Error: Menu for the date "+ getDate(menuRequest) +" is already created!"));
         }
 
-        return new ResponseEntity<>(menuService.createMenu(menuRequest),HttpStatus.CREATED);
+        return new ResponseEntity<>(menu,HttpStatus.CREATED);
     }
 
     @PutMapping("/{date}")

@@ -46,7 +46,6 @@ public class FoodRequestServiceImpl implements FoodRequestService{
     public FoodRequest update(String id, FoodRequest foodRequest) {
         FoodRequest foodRequestNew = getFoodRequestByid(id);
         foodRequestNew.setName(foodRequest.getName());
-        foodRequestNew.setDate(foodRequest.getDate());
         return foodRequestRepository.save(foodRequestNew);
     }
 
