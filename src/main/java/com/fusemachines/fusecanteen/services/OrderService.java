@@ -12,6 +12,7 @@ import java.util.List;
 public interface OrderService {
     OrderResponse createNewOrder(OrderRequest orderRequest);
     OrderResponse updateOrder(String date,OrderRequest orderRequest);
+    OrderResponse updateOrderStatus(String date,String username, String orderStatus);
     List<OrderResponse> getAllOrder();
     List<OrderResponse> getAllOrderDynamic();
     List<Order> getOrderByOrderStatus(OrderStatus orderStatus);

@@ -69,6 +69,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderResponse updateOrderStatus(String date, String username, String orderStatus) {
+        Order order = getOrderByDateUsername( date, username );
+
+        switch (orderStatus) {
+            case "INPROCESS":
+                order.setOrderStatus(OrderStatus.INPROCESS);
+                break;
+            case "READY":
+                order.setOrderStatus(OrderStatus.READY);
+                break;
+            default:
+                order.setOrderStatus(OrderStatus.PENDING);
+        }
+
+        return getOrderResponceAdmin(orderRepository.save(order));
+    }
+
+    @Override
     public List<OrderResponse> getAllOrder() {
         return getOrderResponceAdminList(orderRepository.findAll());
     }
@@ -142,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public OrderResponse getOrderResponceAdmin(Order order){
-        return new OrderResponse(order.getFoodItem(),order.getDate(),getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber());
+        return new OrderResponse(order.getFoodItem(),order.getDate(),getTotalPrice(order),order.getUser().getUsername(),order.getUser().getFullName(),order.getUser().getMobileNumber(),order.getOrderStatus().name());
     }
 
     public List<OrderResponse> getOrderResponceAdminList(List<Order> orderList){
@@ -156,7 +174,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public OrderResponse getOrderResponceEmployee(Order order){
-        return new OrderResponse(order.getFoodItem(),order.getDate(),getTotalPrice(order));
+        return new OrderResponse(order.getFoodItem(),order.getDate(),getTotalPrice(order),order.getOrderStatus().name());
     }
 
     public List<OrderResponse> getOrderResponceEmployeeList(List<Order> orderList){

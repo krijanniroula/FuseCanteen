@@ -30,10 +30,13 @@ public class OrderResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String mobile;
 
-    public OrderResponse(Set<FoodItem> foodItems,LocalDate date,int totalPrice){
+    private String orderStatus;
+
+    public OrderResponse(Set<FoodItem> foodItems,LocalDate date,int totalPrice,String orderStatus){
         this.foodItems=foodItems;
         this.date=date;
         this.totalPrice=totalPrice;
+        this.orderStatus=orderStatus;
     }
 
 }
