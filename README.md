@@ -40,6 +40,35 @@ If signup is for admin role, add "roles":["admin"] to above.
 						 { "name":"Samosa", "price":"60"}
      DELETE   localhost:8080/api/fooditem/<id>   - delete fooditem by id  
      
+Example for retrieve all fooditem list 
+
+     [
+    {
+        "id": "5f5db2e09cfde45dc693934f",
+        "name": "Samosa",
+        "price": 60
+    },
+    {
+        "id": "5f5db3259cfde45dc6939350",
+        "name": "Chicken Khaja Set",
+        "price": 150
+    },
+    {
+        "id": "5f5db4149cfde45dc6939353",
+        "name": "Veg Chowminn",
+        "price": 120
+    },
+    {
+        "id": "5f5db41f9cfde45dc6939354",
+        "name": "Buff Chowminn",
+        "price": 130
+    },
+    {
+        "id": "5f5dd3a78e23105a0681f91d",
+        "name": "Pakoda",
+        "price": 40
+    }
+    ]
 
  <h3>MENU API</h3> 
 
@@ -54,11 +83,35 @@ If signup is for admin role, add "roles":["admin"] to above.
     PUT      localhost:8080/api/menu/<date>   - Update Menu for entered date 
                     {"foodItems":[<Updated list>] } 
     DELETE   localhost:8080/api/menu/<date>   - Delete menu by date
- 
+   
  
  EMPLOYEE:
 
-      GET  localhost:8080/api/menu/today - Get menu for today
+      GET  localhost:8080/api/menu/today - retrieve menu for today
+      
+Example for retrieve menu for today      
+      
+      {
+    "id": "5f609dce0ccea616b03c2b7d",
+    "foodItems": [
+        {
+            "id": "5f5db3259cfde45dc6939350",
+            "name": "Chicken Khaja Set",
+            "price": 150
+        },
+        {
+            "id": "5f5db41f9cfde45dc6939354",
+            "name": "Buff Chowminn",
+            "price": 130
+        },
+        {
+            "id": "5f5dd3a78e23105a0681f91d",
+            "name": "Pakoda",
+            "price": 40
+        }
+    ],
+    "date": "2020-09-15"
+    }
 
 <h3>ORDER API</h3> 
 
@@ -72,9 +125,74 @@ If signup is for admin role, add "roles":["admin"] to above.
     PUT       localhost:8080/api/order/<date>/<username>    - Update orderStatus by date and username
     						   {  "status":"INPROCESS" }
    
+Example for retrieve all order list by date - localhost:8080/api/order/2020-09-15
+
+     [
+    {
+        "foodItems": [
+            {
+                "id": "5f5db3259cfde45dc6939350",
+                "name": "Chicken Khaja Set",
+                "price": 150
+            },
+            {
+                "id": "5f5db2e09cfde45dc693934f",
+                "name": "Samosa",
+                "price": 60
+            }
+        ],
+        "date": "2020-09-15",
+        "totalPrice": 210,
+        "username": "ramesh",
+        "fullName": "Ramesh Adhikari",
+        "mobile": "9876543210",
+        "orderStatus": "READY"
+    },
+    {
+        "foodItems": [
+            {
+                "id": "5f5db3259cfde45dc6939350",
+                "name": "Chicken Khaja Set",
+                "price": 150
+            },
+            {
+                "id": "5f5dd3a78e23105a0681f91d",
+                "name": "Pakoda",
+                "price": 40
+            }
+        ],
+        "date": "2020-09-15",
+        "totalPrice": 190,
+        "username": "paras",
+        "fullName": "Paras Khadka",
+        "mobile": "9886536702",
+        "orderStatus": "READY"
+    },
+    {
+        "foodItems": [
+            {
+                "id": "5f5db3259cfde45dc6939350",
+                "name": "Chicken Khaja Set",
+                "price": 150
+            },
+            {
+                "id": "5f5dd3a78e23105a0681f91d",
+                "name": "Pakoda",
+                "price": 40
+            }
+        ],
+        "date": "2020-09-15",
+        "totalPrice": 190,
+        "username": "mahesh",
+        "fullName": "Mahesh Lamichhane",
+        "mobile": "9875934210",
+        "orderStatus": "INPROCESS"
+    }
+    ]        
+   
  EMPLOYEE : 
 
-    GET	    localhost:8080/api/order/<date>   - retrieve order list by date entered of logged in user
+    GET	    localhost:8080/api/order/<date>   - retrieve order by date entered of logged in user
     GET     localhost:8080/api/order          - retrieve all order list made by logged in user
     POST    localhost:8080/api/order          - Create order for logged in user 
                                    {"foodItems":["Chicken Khaja Set","Samosa"], "date":"2020-09-15"}
@@ -83,6 +201,26 @@ If signup is for admin role, add "roles":["admin"] to above.
                                    {"foodItems":["Pakoda","Samosa"] }
                                  
     DELETE  localhost:8080/api/order/<date>   - Delete order of logged in user by date entered
+    
+Example for retrieve order by date entered - localhost:8080/api/order/2020-09-15
+
+    {
+    "foodItems": [
+        {
+            "id": "5f5db3259cfde45dc6939350",
+            "name": "Chicken Khaja Set",
+            "price": 150
+        },
+        {
+            "id": "5f5db2e09cfde45dc693934f",
+            "name": "Samosa",
+            "price": 60
+        }
+    ],
+    "date": "2020-09-15",
+    "totalPrice": 210,
+    "orderStatus": "INPROCESS"
+    }
 
 <h3>FOODREQUEST API</h3>
 
@@ -92,6 +230,97 @@ If signup is for admin role, add "roles":["admin"] to above.
     GET    localhost:8080/api/foodrequest                - retrieve all foodrequest list
     GET    localhost:8080/api/foodrequest/today          - retrieve todays food request
     GET    localhost:8080/api/foodrequest/today/popular  - retrieve todays food request by popularity
+   
+Example for retrieve todays food request 
+
+    [
+    {
+        "name": "Thuppa",
+        "date": "2020-09-15",
+        "username": "ramesh",
+        "fullName": "Ramesh Adhikari",
+        "mobile": "9876543210"
+    },
+    {
+        "name": "Paneer momo",
+        "date": "2020-09-15",
+        "username": "prakriti",
+        "fullName": "Prakriti Karki",
+        "mobile": "9876534212"
+    },
+    {
+        "name": "Thuppa",
+        "date": "2020-09-15",
+        "username": "prakriti",
+        "fullName": "Prakriti Karki",
+        "mobile": "9876534212"
+    },
+    {
+        "name": "Chicken Cheese Pizza",
+        "date": "2020-09-15",
+        "username": "paras",
+        "fullName": "Paras Khadka",
+        "mobile": "9886536702"
+    },
+    {
+        "name": "Chicken Burger",
+        "date": "2020-09-15",
+        "username": "paras",
+        "fullName": "Paras Khadka",
+        "mobile": "9886536702"
+    },
+    {
+        "name": "Thuppa",
+        "date": "2020-09-15",
+        "username": "mahesh",
+        "fullName": "Mahesh Lamichhane",
+        "mobile": "9875934210"
+    },
+    {
+        "name": "Chicken Burger",
+        "date": "2020-09-15",
+        "username": "mahesh",
+        "fullName": "Mahesh Lamichhane",
+        "mobile": "9875934210"
+    }
+    ]
+    
+
+Example for retrieve todays food request by popularity
+
+    [
+    {
+        "name": "Thuppa",
+        "requestCount": 3,
+        "usernameList": [
+            "mahesh",
+            "prakriti",
+            "ramesh"
+        ]
+    },
+    {
+        "name": "Chicken Burger",
+        "requestCount": 2,
+        "usernameList": [
+            "mahesh",
+            "paras"
+        ]
+    },
+    {
+        "name": "Chicken Cheese Pizza",
+        "requestCount": 1,
+        "usernameList": [
+            "paras"
+        ]
+    },
+    {
+        "name": "Paneer momo",
+        "requestCount": 1,
+        "usernameList": [
+            "prakriti"
+        ]
+    }
+    ]
  
  EMPLOYEE
 
@@ -111,6 +340,32 @@ ADMIN
     GET  localhost:8080/api/feedback                          - retrieve all users feedback list
     GET localhost:8080/api/feedback/user/<username>           - retrieve feedback list by username
     GET localhost:8080/api/feedback/fooditem/<foodItemName>   - retrieve feedback list by food item name
+    
+Example for retrieve all users feedback list 
+
+     [
+    {
+        "foodItemName": "Veg Chowminn",
+        "comment": "It would be better with less oil for me!",
+        "rating": 6,
+        "date": "2020-09-15",
+        "userFullName": "Prakriti Karki"
+    },
+    {
+        "foodItemName": "Pakoda",
+        "comment": "I like it!",
+        "rating": 7,
+        "date": "2020-09-15",
+        "userFullName": "Prakriti Karki"
+    },
+    {
+        "foodItemName": "Chicken Khaja Set",
+        "comment": "It was quite delicious!",
+        "rating": 9,
+        "date": "2020-09-15",
+        "userFullName": "Ramesh Adhikari"
+    }
+    ]
 
  EMPLOYEE
 
