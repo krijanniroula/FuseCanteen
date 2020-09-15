@@ -1,7 +1,9 @@
 package com.fusemachines.fusecanteen.controllers;
 
 import com.fusemachines.fusecanteen.common.Utils;
+import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.payload.request.OrderRequest;
+import com.fusemachines.fusecanteen.payload.response.MessageResponse;
 import com.fusemachines.fusecanteen.payload.response.OrderResponse;
 import com.fusemachines.fusecanteen.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +21,12 @@ public class OrderController {
     OrderService orderService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     public ResponseEntity<?> getAllOrders() {
 
-        List<OrderResponse> orderResponses = orderService.getAllOrder();
-
+        List<OrderResponse> orderResponses = orderService.getAllOrderDynamic();
         if (orderResponses.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return ResponseEntity.ok(new MessageResponse("Order list is empty!"));
         }
         return new ResponseEntity<>(orderResponses, HttpStatus.OK);
     }
@@ -42,6 +43,9 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getOrdersByDateUser( @PathVariable String date, @PathVariable String username) {
         OrderResponse orderResponse = orderService.getOrderForAdmin( date , username );
+        if (orderResponse==null){
+            throw new ResourceNotFoundException("Order not found for date = "+date +" username = "+username);
+        }
         return new ResponseEntity<>(orderResponse, HttpStatus.OK );
 
     }

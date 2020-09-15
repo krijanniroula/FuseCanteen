@@ -13,6 +13,7 @@ public interface OrderService {
     OrderResponse createNewOrder(OrderRequest orderRequest);
     OrderResponse updateOrder(String date,OrderRequest orderRequest);
     List<OrderResponse> getAllOrder();
+    List<OrderResponse> getAllOrderDynamic();
     List<Order> getOrderByOrderStatus(OrderStatus orderStatus);
     List<Order> getOrderByDate(LocalDate date);
     int getTotalPrice(Order order);

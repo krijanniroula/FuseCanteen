@@ -3,6 +3,7 @@ package com.fusemachines.fusecanteen.controllers;
 import com.fusemachines.fusecanteen.models.FoodRequest;
 
 import com.fusemachines.fusecanteen.payload.response.FoodRequestResponse;
+import com.fusemachines.fusecanteen.payload.response.MessageResponse;
 import com.fusemachines.fusecanteen.services.FoodRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,9 @@ public class FoodRequestController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     public ResponseEntity<?> getAllFoodRequests() {
         List<FoodRequestResponse> foodRequestResponseList = foodRequestService.getAllFoodRequestsDynamic();
+        if (foodRequestResponseList.isEmpty()){
+            return ResponseEntity.ok(new MessageResponse("FoodRequest list is empty!"));
+        }
         return new ResponseEntity<>(foodRequestResponseList, HttpStatus.OK);
     }
 
@@ -31,6 +35,9 @@ public class FoodRequestController {
     public ResponseEntity<?> getAllFoodRequestsForToday() {
 
         List<FoodRequestResponse> foodRequestResponseList = foodRequestService.getFoodRequestForToday();
+        if (foodRequestResponseList.isEmpty()){
+            return ResponseEntity.ok(new MessageResponse("FoodRequest list for today is empty!"));
+        }
         return new ResponseEntity<>(foodRequestResponseList, HttpStatus.OK);
     }
 

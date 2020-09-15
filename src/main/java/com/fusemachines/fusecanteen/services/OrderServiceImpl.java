@@ -35,7 +35,6 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setFoodItem( getFoodItemsFromName(orderRequest) );
-        order.setDate(LocalDate.parse(orderRequest.getDate()));
 
         User user = userService.getUserByUsername(Utils.getLoggedUsername());
         // set logged in user to order request
@@ -44,6 +43,8 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatus.PENDING);
         if (orderRequest.getDate()==null){
             order.setDate(LocalDate.now());
+        } else {
+            order.setDate(LocalDate.parse(orderRequest.getDate()));
         }
         order.setTotalPrice(getTotalPrice(order));
         return getOrderResponceEmployee(orderRepository.save(order));
@@ -76,6 +77,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderResponse> getAllOrderDynamic(){
+        User user = userService.getUserByUsername(Utils.getLoggedUsername());
+        if (Utils.userHasRoleAdmin(user)){
+            return getAllOrder();
+        } else {
+            List<Order> orderList =orderRepository.findByUser(user);
+            return getOrderResponceEmployeeList(orderList);
+        }
+    }
+
+    @Override
     public List<Order> getOrderByOrderStatus(OrderStatus orderStatus) {
         return orderRepository.findByOrderStatus(orderStatus);
     }
@@ -86,7 +98,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Order getOrderByDateUserId(LocalDate date,String id ) {
-        return orderRepository.findByDateAndUserId( date,id );
+        Order order = orderRepository.findByDateAndUserId( date,id );
+        if (order==null){
+            throw new ResourceNotFoundException("Order not found with date = "+date);
+        }
+        return order;
     }
 
     @Override
@@ -103,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
         } else {
             Order order = getOrderByDateUsername(date, Utils.getLoggedUsername());
             if (order==null){
-                return new OrderResponse();
+                return new ResourceNotFoundException("Order not found with date = "+date);
             }
             return getOrderResponceEmployee(order);
         }
@@ -119,9 +135,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse getOrderForAdmin(String date, String username){
         Order order = getOrderByDateUsername( date , username );
-        if (order == null){
-            return new OrderResponse();
-        }
         return getOrderResponceAdmin(order);
     }
 
@@ -142,10 +155,6 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderResponse> orderResponses = new ArrayList<>();
 
-        if (orderList.isEmpty()){
-            return orderResponses;
-        }
-
         for (Order order : orderList){
             orderResponses.add(getOrderResponceAdmin(order));
         }
@@ -154,6 +163,16 @@ public class OrderServiceImpl implements OrderService {
 
     public OrderResponse getOrderResponceEmployee(Order order){
         return new OrderResponse(order.getFoodItem(),order.getDate(),getTotalPrice(order));
+    }
+
+    public List<OrderResponse> getOrderResponceEmployeeList(List<Order> orderList){
+
+        List<OrderResponse> orderResponses = new ArrayList<>();
+
+        for (Order order : orderList){
+            orderResponses.add(getOrderResponceEmployee(order));
+        }
+        return orderResponses;
     }
 
     /*

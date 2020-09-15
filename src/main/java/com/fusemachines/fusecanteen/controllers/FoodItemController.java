@@ -20,11 +20,11 @@ public class FoodItemController {
     FoodItemService foodItemService;
 
     @GetMapping
-    public ResponseEntity<List<FoodItem>> getAllFoodItems() {
+    public ResponseEntity<?> getAllFoodItems() {
 
         List<FoodItem> foodItemList = foodItemService.getAllFoodItems();
         if (foodItemList.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return ResponseEntity.ok(new MessageResponse("FoodItems list is empty!"));
         }
         return new ResponseEntity<>(foodItemList, HttpStatus.OK);
     }
@@ -48,11 +48,6 @@ public class FoodItemController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFoodItem(@PathVariable String id, @RequestBody FoodItem foodItem) {
-        if (foodItemService.existsByName(foodItem.getName())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Food Item with name "+foodItem.getName()+" is already created!"));
-        }
         FoodItem foodItemNew = foodItemService.update(id,foodItem);
         return new ResponseEntity<>( foodItemNew,HttpStatus.OK);
     }

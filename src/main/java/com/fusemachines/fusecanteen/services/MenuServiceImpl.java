@@ -56,6 +56,9 @@ public class MenuServiceImpl implements MenuService{
     @Override
     public Menu getMenuByDate(String date) {
         Menu menu = menuRepository.findByDate(LocalDate.parse(date));
+        if (menu==null){
+            throw new ResourceNotFoundException("Menu not found for date = "+date);
+        }
         return menu;
     }
 

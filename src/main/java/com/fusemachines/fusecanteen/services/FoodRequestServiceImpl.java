@@ -58,7 +58,11 @@ public class FoodRequestServiceImpl implements FoodRequestService{
 
     @Override
     public FoodRequest getFoodRequestByName(String name) {
-        return foodRequestRepository.findByName(name);
+        FoodRequest foodRequest = foodRequestRepository.findByName(name);
+        if (foodRequest==null){
+            throw new ResourceNotFoundException("Food request not found with name = "+name);
+        }
+        return foodRequest;
     }
 
     @Override

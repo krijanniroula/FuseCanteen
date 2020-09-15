@@ -24,11 +24,11 @@ public class MenuController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllMenus() {
 
-        List<Menu> MenuList = menuService.getAllMenu();
-        if (MenuList.isEmpty()){
+        List<Menu> menuList = menuService.getAllMenu();
+        if (menuList.isEmpty()){
             return ResponseEntity.ok(new MessageResponse("Menu list is empty!"));
         }
-        return new ResponseEntity<>(MenuList, HttpStatus.OK);
+        return new ResponseEntity<>(menuList, HttpStatus.OK);
     }
 
     @GetMapping("/{date}")
@@ -36,9 +36,6 @@ public class MenuController {
     public ResponseEntity<?> getMenusByDate(@PathVariable String date) {
 
         Menu menu = menuService.getMenuByDate( date );
-        if (menu == null){
-            return ResponseEntity.ok(new MessageResponse("Menu not found for date = "+date));
-        }
         return new ResponseEntity<>( menu, HttpStatus.OK );
 
     }
@@ -48,9 +45,6 @@ public class MenuController {
     public ResponseEntity<?> getMenusForToday() {
 
         Menu menu = menuService.getMenuByDate( LocalDate.now().toString() );
-        if (menu == null){
-            return ResponseEntity.ok(new MessageResponse("Menu not found for today!"));
-        }
         return new ResponseEntity<>( menu, HttpStatus.OK );
 
     }
