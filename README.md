@@ -99,7 +99,24 @@ If signup is for admin role, add "roles":["admin"] to above.
     GET  localhost:8080/api/foodrequest          - retrieve all request made by logged in user
     GET  localhost:8080/api/foodrequest/<id>     - retrieve request made by id
     POST localhost:8080/api/foodrequest          - create new food request
- 					                         {  "name":"Thuppa" }
+ 					     {  "name":"Thupa" }
     PUT localhost:8080/api/foodrequest/<id>      - update food request by id
-                                     {  "name":"Thuppa" }
+                                            {  "name":"Thuppa" }
     DELETE localhost:8080/api/foodrequest/<id>  - delete by id
+    
+<h3>FEEDBACK API</h3>
+
+ADMIN
+
+    GET  localhost:8080/api/feedback                          - retrieve all users feedback list
+    GET localhost:8080/api/feedback/user/<username>           - retrieve feedback list by username
+    GET localhost:8080/api/feedback/fooditem/<foodItemName>   - retrieve feedback list by food item name
+
+ EMPLOYEE
+
+    GET localhost:8080/api/feedback                      - retrieve feedback list of user logged in 
+    POST localhost:8080/api/feedback                     - create new feedback
+                        {   "foodItemName":"Pakoda",   "comment":"I like it!",   "rating":"7"  }
+    PUT   localhost:8080/api/feedback/<foodItemName>     - update feedback by fooditem for logged in user
+	                 {   "comment":"I like it!",   "rating":"5"  }
+    DELETE   localhost:8080/api/feedback/<foodItemName>  - delete feedback by fooditem for logged in user
