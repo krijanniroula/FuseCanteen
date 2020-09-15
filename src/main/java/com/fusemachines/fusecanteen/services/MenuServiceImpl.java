@@ -3,11 +3,13 @@ package com.fusemachines.fusecanteen.services;
 import com.fusemachines.fusecanteen.exception.ResourceNotFoundException;
 import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.Menu;
+import com.fusemachines.fusecanteen.payload.request.MenuRequest;
 import com.fusemachines.fusecanteen.repository.MenuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,16 +19,32 @@ public class MenuServiceImpl implements MenuService{
     @Autowired
     MenuRepository menuRepository;
 
+    @Autowired
+    FoodItemService foodItemService;
+
     @Override
-    public Menu save(Menu menu) {
+    public Menu createMenu(MenuRequest menuRequest) {
+        Menu menu = new Menu(LocalDate.now());
+        menu.setFoodItems( getFoodItemsFromName(menuRequest) );
         return menuRepository.save(menu);
     }
 
-    @Override
-    public Menu update(String date, Set<FoodItem> foodItems) {
+    public Set<FoodItem> getFoodItemsFromName(MenuRequest request) {
+        Set<String> foodItemNames = request.getFoodItems();
+        Set<FoodItem> foodItems = new HashSet<>();
 
+        foodItemNames.forEach(name -> {
+            FoodItem foodItem = foodItemService.getFoodItemByName(name);
+            foodItems.add(foodItem);
+        });
+        return foodItems;
+    }
+
+    @Override
+    public Menu updateMenu(String date, MenuRequest menuRequest) {
         Menu menuNew = getMenuByDate(date);
-        menuNew.setFoodItems(foodItems);
+        Set<FoodItem> foodItemSet = getFoodItemsFromName(menuRequest);
+        menuNew.setFoodItems(foodItemSet);
         return menuRepository.save(menuNew);
     }
 

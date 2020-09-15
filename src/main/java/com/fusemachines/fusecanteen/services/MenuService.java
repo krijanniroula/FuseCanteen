@@ -2,14 +2,15 @@ package com.fusemachines.fusecanteen.services;
 
 import com.fusemachines.fusecanteen.models.FoodItem;
 import com.fusemachines.fusecanteen.models.Menu;
+import com.fusemachines.fusecanteen.payload.request.MenuRequest;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 public interface MenuService {
-    Menu save(Menu menu);
-    Menu update(String date, Set<FoodItem> foodItems) ;
+    Menu createMenu(MenuRequest menuRequest);
+    Menu updateMenu(String date,MenuRequest menuRequest) ;
     List<Menu> getAllMenu();
     Menu getMenuByDate(String date);
     Menu getMenuById(String id);
